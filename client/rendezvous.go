@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
@@ -14,7 +15,7 @@ type Rendezvous struct {
 
 func NewRendezvous() *Rendezvous {
 	rendez := &Rendezvous{
-		PeerSuscribeEndpoint: "https://rendezvous.dap2p.net/",
+		PeerSuscribeEndpoint: "https://rendezvous.dap2p.net:6667/peers/subscribe",
 	}
 
 	return rendez
@@ -48,15 +49,17 @@ func (rendez *Rendezvous) TestMutualTLS() error {
 
 	httpClient := &http.Client{Transport: tr}
 
-	resp, err := httpClient.Get(rendez.PeerSuscribeEndpoint)
+	resp, err := httpClient.Post(rendez.PeerSuscribeEndpoint, "text/html", bytes.NewBuffer([]byte("post-data")))
 	if err != nil {
 		return err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+
 		return err
 	}
+	println(resp.StatusCode)
 	println(string(body))
 
 	return nil

@@ -20,7 +20,7 @@ type PKI struct {
 
 func NewPKI() *PKI {
 	pki := &PKI{
-		IdentityEndpoint: "https://pki.dap2p.net:6667/pki/register",
+		IdentityEndpoint: "https://pki.dap2p.net:6666/pki/register",
 	}
 
 	return pki
