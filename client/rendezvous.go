@@ -15,7 +15,7 @@ type Rendezvous struct {
 
 func NewRendezvous() *Rendezvous {
 	rendez := &Rendezvous{
-		PeerSuscribeEndpoint: "https://rendezvous.dap2p.net:6667/peers/subscribe",
+		PeerSuscribeEndpoint: "https://rendezvous.dap2p.net/peers/subscribe",
 	}
 
 	return rendez
@@ -41,6 +41,7 @@ func (rendez *Rendezvous) TestMutualTLS() error {
 	tlsConfig := &tls.Config{
 		RootCAs:      certPool,
 		Certificates: []tls.Certificate{tlsCertChain},
+		MaxVersion:   tls.VersionTLS12, // TODO: ONLY FOR DEBUGGING PURPOSES (wireshark)
 	}
 
 	tr := &http.Transport{
