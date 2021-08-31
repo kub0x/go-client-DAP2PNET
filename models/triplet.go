@@ -6,6 +6,10 @@ type Triplet struct {
 	Port string `json name=port`
 }
 
+type PeerInfo struct {
+	Triplets []Triplet `json name=triplets`
+}
+
 type SubscribeRequest struct {
 	Port uint16 `json name=port`
 }

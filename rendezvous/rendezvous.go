@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"dap2pnet/client/models"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -19,7 +20,7 @@ type Rendezvous struct {
 func NewRendezvous(port uint16) *Rendezvous {
 	rendez := &Rendezvous{
 		PeerSuscribeEndpoint: "https://rendezvous.dap2p.net/peers/subscribe",
-		PeerExchangeEndpoint: "https://rendezvous.dap2p.net/peers",
+		PeerExchangeEndpoint: "https://rendezvous.dap2p.net/peers/",
 		NodePort:             port,
 	}
 
@@ -116,11 +117,17 @@ func (rendez *Rendezvous) TestPeerExchange() error {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-
 		return err
 	}
+
+	var peers models.PeerInfo
+	err = json.Unmarshal(body, &peers)
+	if err != nil {
+		return err
+	}
+
 	println(resp.StatusCode)
-	println(string(body))
+	fmt.Println(peers)
 
 	return nil
 }

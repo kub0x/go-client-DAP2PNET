@@ -28,7 +28,8 @@ func main() {
 		log.Fatal("couldnt mutual tls: " + err.Error())
 	}
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 3)
 	rendez.TestPeerExchange()
-	time.Sleep(time.Minute * 2)
+	time.Sleep(time.Minute * 1)
+	log.Fatal("finished")
 }
