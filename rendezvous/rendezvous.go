@@ -1,13 +1,14 @@
 package rendezvous
 
 import (
+	"dap2pnet/client/kademlia/buckets"
 	"dap2pnet/client/models"
 	"dap2pnet/client/utils"
 	"encoding/json"
-	"fmt"
 )
 
 type Rendezvous struct {
+	Buckets              *buckets.Buckets
 	PeerSuscribeEndpoint string
 	PeerExchangeEndpoint string
 	NodePort             uint16
@@ -15,6 +16,7 @@ type Rendezvous struct {
 
 func NewRendezvous(port uint16) *Rendezvous {
 	rendez := &Rendezvous{
+		Buckets:              buckets.NewBuckets(),
 		PeerSuscribeEndpoint: "https://rendezvous.dap2p.net/peers/subscribe",
 		PeerExchangeEndpoint: "https://rendezvous.dap2p.net/peers/",
 		NodePort:             port,
@@ -52,7 +54,11 @@ func (rendez *Rendezvous) TestPeerExchange() error {
 		return err
 	}
 
-	fmt.Println(peers)
+	for _, triplet := range peers.Triplets {
+		rendez.Buckets.AddTriplet(triplet)
+	}
+
+	rendez.Buckets.PrintBuckets()
 
 	return nil
 }
