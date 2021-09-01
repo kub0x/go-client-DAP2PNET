@@ -5,13 +5,11 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"dap2pnet/client/utils"
 	"encoding/pem"
-	"errors"
 	"io/ioutil"
-	"net/http"
 )
 
 type PKI struct {
@@ -79,35 +77,7 @@ func (pki *PKI) IssueIdentity() error {
 		return err
 	}
 
-	certPool := x509.NewCertPool()
-
-	caBytes, err := ioutil.ReadFile("./certs/ca.pem")
-	if err != nil {
-		return err
-	}
-	certPool.AppendCertsFromPEM(caBytes)
-
-	// trust dap2pnet CA
-
-	tlsConfig := &tls.Config{
-		RootCAs: certPool,
-	}
-
-	tr := &http.Transport{
-		TLSClientConfig: tlsConfig,
-	}
-
-	httpClient := &http.Client{Transport: tr}
-	resp, err := httpClient.Post(pki.IdentityEndpoint, "text/html", bytes.NewBuffer(csrPEM.Bytes()))
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return errors.New("unvalid status code")
-	}
-
-	certChain, err := ioutil.ReadAll(resp.Body)
+	certChain, err := utils.NewHTTPSRequest(pki.IdentityEndpoint, "POST", csrPEM.Bytes(), false)
 	if err != nil {
 		return err
 	}
