@@ -29,5 +29,4 @@ func main() {
 	}
 
 	rendez.TestPeerExchange()
-	time.Sleep(time.Second * 30)
 }
