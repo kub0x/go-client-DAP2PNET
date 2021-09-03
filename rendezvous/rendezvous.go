@@ -5,6 +5,7 @@ import (
 	"dap2pnet/client/models"
 	"dap2pnet/client/utils"
 	"encoding/json"
+	"log"
 )
 
 type Rendezvous struct {
@@ -34,8 +35,9 @@ func (rendez *Rendezvous) TestMutualTLS() error {
 		return err
 	}
 
-	_, err = utils.NewHTTPSRequest(rendez.PeerSuscribeEndpoint, "POST", subBytes, true)
+	msg, err := utils.NewHTTPSRequest(rendez.PeerSuscribeEndpoint, "POST", subBytes, true)
 	if err != nil {
+		log.Println(string(msg))
 		return err
 	}
 

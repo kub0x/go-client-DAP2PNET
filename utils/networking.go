@@ -54,13 +54,13 @@ func NewHTTPSRequest(URL string, method string, data []byte, mutualTLS bool) ([]
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("unvalid status code")
-	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return body, errors.New("unvalid status code")
 	}
 
 	return body, nil
