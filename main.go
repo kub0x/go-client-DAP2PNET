@@ -15,7 +15,7 @@ func main() {
 		server.Run(nodePort) // TODO: Work with gin when testing is done
 	}()*/
 	limit := time.Now().Add(time.Second * 30).UnixNano()
-	for limit < time.Now().UnixNano() {
+	for time.Now().UnixNano() < limit {
 		pki := pki.NewPKI()
 
 		err := pki.IssueIdentity()
