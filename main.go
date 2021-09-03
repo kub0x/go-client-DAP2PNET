@@ -14,19 +14,22 @@ func main() {
 	/*go func() {
 		server.Run(nodePort) // TODO: Work with gin when testing is done
 	}()*/
+	limit := time.Now().Add(time.Second * 30).UnixNano()
+	for limit < time.Now().UnixNano() {
+		pki := pki.NewPKI()
 
-	pki := pki.NewPKI()
+		err := pki.IssueIdentity()
+		if err != nil {
+			log.Fatal("couldnt get identity: " + err.Error())
+		}
 
-	err := pki.IssueIdentity()
-	if err != nil {
-		log.Fatal("couldnt get identity: " + err.Error())
+		rendez := rendezvous.NewRendezvous(nodePort)
+		err = rendez.TestMutualTLS()
+		if err != nil {
+			log.Fatal("couldnt mutual tls: " + err.Error())
+		}
+
+		rendez.TestPeerExchange()
 	}
 
-	rendez := rendezvous.NewRendezvous(nodePort)
-	err = rendez.TestMutualTLS()
-	if err != nil {
-		log.Fatal("couldnt mutual tls: " + err.Error())
-	}
-
-	rendez.TestPeerExchange()
 }
