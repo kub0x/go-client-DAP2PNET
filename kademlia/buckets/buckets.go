@@ -14,6 +14,7 @@ type Buckets struct {
 	ParentID string
 	MaxLen   int
 	List     map[int]*Bucket
+	alpha    int
 }
 
 func NewBuckets() *Buckets {
@@ -44,14 +45,53 @@ func NewBuckets() *Buckets {
 	return bucks
 }
 
-func (bucks *Buckets) AddTriplet(triplet models.Triplet) {
+func (bucks *Buckets) distanceToParent(keyID string) *big.Int {
 	// calculate distances so hex -> int needed for XORing and sorting
-	peerIntID, _ := big.NewInt(0).SetString(triplet.ID, 16)
-	parentIntID, _ := big.NewInt(0).SetString(bucks.ParentID, 16)
-	distance := parentIntID.Xor(parentIntID, peerIntID) // WTF Golang only 1 arg should do it - missing my cpp operators :/
-	log2Dist := distance.BitLen() - 1                   // zero index so minus 1
+	keyIntID, _ := big.NewInt(0).SetString(keyID, 16)
+	parentIntID, _ := big.NewInt(0).SetString(bucks.ParentID, 16) // WTF Golang only 1 arg should do it - missing my cpp operators :/
+	return parentIntID.Xor(parentIntID, keyIntID)
+}
+
+func (bucks *Buckets) AddTriplet(triplet models.Triplet) {
+	distance := bucks.distanceToParent(triplet.ID)
+	log2Dist := distance.BitLen() - 1 // zero index so minus 1
+	//println(log2Dist)
 	targetBucket := bucks.List[log2Dist]
 	targetBucket.Add(triplet, *distance)
+}
+
+func (bucks *Buckets) NearestToKey(keyID string) *models.PeerInfo {
+	distance := bucks.distanceToParent(keyID)
+	log2Dist := distance.BitLen() - 1 // zero index so minus 1
+	success := false
+	peers := &models.PeerInfo{}
+	for i := log2Dist; i >= 0; i-- {
+		if len(bucks.List[i].Triplets) > 0 {
+			for _, v := range bucks.List[i].Triplets {
+				peers.Triplets = append(peers.Triplets, v)
+			}
+			success = true
+			break
+		}
+	}
+	if success {
+		return peers
+	}
+
+	for i := log2Dist + 1; i < bucks.MaxLen; i++ {
+		if len(bucks.List[i].Triplets) > 0 {
+			for _, v := range bucks.List[i].Triplets {
+				peers.Triplets = append(peers.Triplets, v)
+			}
+			success = true
+			break
+		}
+	}
+	if success {
+		return peers
+	}
+
+	return nil
 }
 
 func (bucks *Buckets) PrintBuckets() {

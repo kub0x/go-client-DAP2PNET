@@ -59,8 +59,8 @@ func (rendez *Rendezvous) TestPeerExchange() error {
 	for _, triplet := range peers.Triplets {
 		rendez.Buckets.AddTriplet(triplet)
 	}
-
-	rendez.Buckets.PrintBuckets()
+	//println(len(peers.Triplets))
+	//rendez.Buckets.PrintBuckets()
 
 	return nil
 }

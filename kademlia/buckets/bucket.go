@@ -26,13 +26,16 @@ func NewBucket(bitOrder int) *Bucket {
 }
 
 func (buck *Bucket) Add(triplet models.Triplet, distance big.Int) {
+	//fmt.Println(buck.curLen)
 	if buck.curLen < buck.maxLen {
 		triplet.Distance = distance
 		buck.Triplets[triplet.ID] = triplet
+		//println(triplet.ID)
 		buck.curLen++
-	} else {
-		// TODO HANDLE PEER REMOVAL
-		println("EXCEEDED MAX CAPACITY")
 	}
+	// } else {
+	// 	// TODO HANDLE PEER REMOVAL
+	// 	println("EXCEEDED MAX CAPACITY")
+	// }
 
 }

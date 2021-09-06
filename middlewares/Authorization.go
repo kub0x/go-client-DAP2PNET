@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"math/big"
 	"net/http"
 	"net/url"
 	"strings"
@@ -11,6 +12,8 @@ import (
 
 var (
 	AuthorizationMiddlewareErrIdentityNotFound = errors.New("identity not found. Proxy didn't send CN field")
+	AuthorizationMiddlewareErrUnvalidKey       = errors.New("key format is unvalid")
+	AuthorizationMiddlewareErrKeyIDNotfound    = errors.New("please provide a key id")
 )
 
 func SetPeerIdentity() gin.HandlerFunc {
@@ -30,4 +33,26 @@ func SetPeerIdentity() gin.HandlerFunc {
 		c.Request.Header.Add("Peer-Identity", identity) // For logging purposes
 		c.Set("Identity", identity)
 	}
+}
+
+func CheckKey() gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+		keyID := c.Param("keyid")
+		if keyID == "" {
+			c.AbortWithError(http.StatusForbidden, AuthorizationMiddlewareErrKeyIDNotfound)
+			return
+		}
+		keyIntID := new(big.Int)
+		keyIntID.SetString(keyID, 16)
+		println(keyIntID.BitLen())
+
+		if keyIntID.BitLen() > 256 {
+			c.AbortWithError(http.StatusForbidden, AuthorizationMiddlewareErrUnvalidKey)
+			return
+		}
+
+		c.Set("keyID", keyID)
+	}
+
 }
