@@ -11,6 +11,12 @@ import (
 )
 
 func main() {
+	pki := pki.NewPKI()
+	err := pki.IssueIdentity()
+	if err != nil {
+		log.Fatal("couldnt get identity: " + err.Error())
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	nodePort := uint16(1025 + rand.Intn(65535-1025+1))
 	limit := time.Now().Add(time.Second * 45).UnixNano()
@@ -23,14 +29,7 @@ func main() {
 	}(rendez.Buckets)
 
 	for time.Now().UnixNano() < limit {
-		pki := pki.NewPKI()
-
-		err := pki.IssueIdentity()
-		if err != nil {
-			log.Fatal("couldnt get identity: " + err.Error())
-		}
-
-		err = rendez.TestMutualTLS()
+		err := rendez.TestMutualTLS()
 		if err != nil {
 			log.Fatal("couldnt mutual tls: " + err.Error())
 		}
@@ -42,6 +41,8 @@ func main() {
 		// if err != nil {
 		// 	log.Fatal(err)
 		// }
+
+		// fmt.Println(nearests)
 
 		// for _, triplet := range nearests.Triplets {
 		// 	rendez.Buckets.AddTriplet(triplet)
