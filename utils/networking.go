@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -90,7 +91,7 @@ func NewHTTPSRequest(URL string, method string, data []byte, mutualTLS bool) ([]
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return body, errors.New("unvalid status code")
+		return body, errors.New(fmt.Sprintf("unvalid status code: %v", resp.StatusCode))
 	}
 
 	return body, nil

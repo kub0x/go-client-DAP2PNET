@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 )
 
 type Kademlia struct {
@@ -61,7 +62,10 @@ func (kad *Kademlia) FindNodes(key string) (*models.PeerInfo, error) {
 		return nil, errors.New("no near nodes to key")
 	}
 	for j := 0; j < len(nearest.Triplets); j++ {
-		kad.findNodes(finalPeers, nearest.Triplets[j], key, 1)
+		err := kad.findNodes(finalPeers, nearest.Triplets[j], key, 1)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 	return finalPeers, nil
